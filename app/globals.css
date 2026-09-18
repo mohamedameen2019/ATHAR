@@ -1,0 +1,124 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #FBFBFA;
+  --surface: #FFFFFF;
+  --surface-hover: #F5F4EF;
+  --foreground: #101114;
+  --muted: #686D7D;
+  --border: #EBE9E1;
+  --accent: #C5A880;
+  --accent-hover: #A98B60;
+  --reading-progress: #C5A880;
+}
+
+.dark {
+  --background: #090A0C;
+  --surface: #121418;
+  --surface-hover: #191C22;
+  --foreground: #EFF1F5;
+  --muted: #9298A8;
+  --border: #1E2027;
+  --accent: #C5A880;
+  --accent-hover: #D5B88D;
+  --reading-progress: #D5B88D;
+}
+
+html {
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-ibm-plex-arabic), system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Custom Editorial Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(197, 168, 128, 0.25);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(197, 168, 128, 0.5);
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-delay: -1ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    background-attachment: initial !important;
+    scroll-behavior: auto !important;
+    transition-delay: 0s !important;
+    transition-duration: 0s !important;
+  }
+}
+
+/* Selection highlight */
+::selection {
+  background-color: rgba(197, 168, 128, 0.25);
+  color: inherit;
+}
+
+/* Editorial Article Measure */
+.prose-editorial {
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 1.125rem;
+  line-height: 2.1;
+  color: inherit;
+}
+
+.prose-editorial p {
+  margin-bottom: 1.75rem;
+  text-align: justify;
+}
+
+.prose-editorial h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-top: 3rem;
+  margin-bottom: 1.25rem;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+.prose-editorial h3 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin-top: 2.25rem;
+  margin-bottom: 1rem;
+}
+
+.prose-editorial blockquote {
+  margin: 2.5rem 0;
+  padding: 1.5rem 2rem;
+  border-right: 4px solid var(--accent);
+  background-color: rgba(197, 168, 128, 0.05);
+  border-radius: 0.25rem;
+  font-style: normal;
+  font-size: 1.2rem;
+  line-height: 1.9;
+}
