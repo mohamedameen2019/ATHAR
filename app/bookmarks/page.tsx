@@ -94,7 +94,7 @@ export default function BookmarksPage() {
             لا توجد مقالات محفوظة حالياً
           </h3>
           <p className="text-xs text-charcoal-500 dark:text-charcoal-400 mb-6 leading-relaxed">
-            أثناء تصفحك للتحقيقات الوثائقية، انقر على زر "حفظ المقال" لإضافته إلى قائمتك وقراءته بتركيز لاحقاً.
+            أثناء تصفحك للتحقيقات الوثائقية، انقر على زر &ldquo;حفظ المقال&rdquo; لإضافته إلى قائمتك وقراءته بتركيز لاحقاً.
           </p>
           <Link
             href="/"

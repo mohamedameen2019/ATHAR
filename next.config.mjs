@@ -10,7 +10,15 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "cdn.sanity.io",
+        hostname: "*.supabase.co",
+      },
+      {
+        protocol: "https",
+        hostname: "gyqcdkilwzyctkdyfdfl.supabase.co",
+      },
+      {
+        protocol: "https",
+        hostname: "i.ibb.co",
       },
       {
         protocol: "https",

@@ -4,8 +4,7 @@ import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Search as SearchIcon, X, Filter, Clock, Calendar, AlertCircle } from "lucide-react";
-import { demoArticles } from "@/lib/data/demoArticles";
+import { Search as SearchIcon, X, Clock, Calendar, AlertCircle, Loader2 } from "lucide-react";
 import { demoCategories } from "@/lib/data/demoCategories";
 import { Article } from "@/types";
 import { formatArabicDate } from "@/lib/utils";
@@ -19,12 +18,40 @@ function SearchContent() {
 
   const [query, setQuery] = React.useState(initialQuery);
   const [selectedCategory, setSelectedCategory] = React.useState(initialCategory);
+  const [results, setResults] = React.useState<Article[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
 
   // Sync state when URL params change
   React.useEffect(() => {
-    setQuery(searchParams.get("q") || "");
-    setSelectedCategory(searchParams.get("cat") || "");
+    const q = searchParams.get("q") || "";
+    const cat = searchParams.get("cat") || "";
+    setQuery(q);
+    setSelectedCategory(cat);
   }, [searchParams]);
+
+  // Debounced search directly against Supabase PostgreSQL
+  React.useEffect(() => {
+    const timer = setTimeout(async () => {
+      setIsLoading(true);
+      try {
+        const params = new URLSearchParams();
+        if (query.trim()) params.set("q", query.trim());
+        if (selectedCategory) params.set("cat", selectedCategory);
+
+        const res = await fetch(`/api/search?${params.toString()}`);
+        const data = await res.json();
+        if (res.ok && data.results) {
+          setResults(data.results);
+        }
+      } catch (err) {
+        console.error("Search error:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }, 250);
+
+    return () => clearTimeout(timer);
+  }, [query, selectedCategory]);
 
   const updateSearchUrl = (newQuery: string, newCat: string) => {
     const params = new URLSearchParams();
@@ -51,26 +78,6 @@ function SearchContent() {
     router.replace("/search");
   };
 
-  // Filter articles
-  const results: Article[] = React.useMemo(() => {
-    const q = query.trim().toLowerCase();
-
-    return demoArticles.filter((article) => {
-      const matchesCat = !selectedCategory || article.category.slug === selectedCategory;
-      if (!matchesCat) return false;
-
-      if (!q) return true;
-
-      const inTitle = article.title.toLowerCase().includes(q);
-      const inSubtitle = article.subtitle?.toLowerCase().includes(q);
-      const inExcerpt = article.excerpt.toLowerCase().includes(q);
-      const inTags = article.tags.some((t) => t.toLowerCase().includes(q));
-      const inAuthor = article.author.name.toLowerCase().includes(q);
-
-      return inTitle || inSubtitle || inExcerpt || inTags || inAuthor;
-    });
-  }, [query, selectedCategory]);
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-20">
       {/* Search Header */}
@@ -79,19 +86,23 @@ function SearchContent() {
           البحث في الأرشيف الوثائقي
         </h1>
         <p className="text-sm text-charcoal-600 dark:text-charcoal-400">
-          ابحث في المقالات، والوثائق التاريخية، والاكتشافات العلمية، والتحقيقات الاستقصائية.
+          ابحث في المقالات، والوثائق التاريخية، والاكتشافات العلمية، والتحقيقات الاستقصائية عبر قاعدة بيانات Supabase.
         </p>
 
         {/* Search Input Bar */}
         <div className="relative mt-6">
           <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-charcoal-400">
-            <SearchIcon className="w-5 h-5 text-bronze-500" />
+            {isLoading ? (
+              <Loader2 className="w-5 h-5 text-bronze-500 animate-spin" />
+            ) : (
+              <SearchIcon className="w-5 h-5 text-bronze-500" />
+            )}
           </div>
           <input
             type="text"
             value={query}
             onChange={handleQueryChange}
-            placeholder="اكتب كلمة البحث (مثال: بومبي، أهرامات، جيمس ويب، إنيغما)..."
+            placeholder="اكتب كلمة البحث (مثال: ديانا، نور الشريف، مصر، بومبي، كوريا)..."
             className="w-full pr-12 pl-12 py-3.5 rounded-2xl border border-ivory-200 dark:border-charcoal-700 bg-white dark:bg-charcoal-900 text-sm text-charcoal-950 dark:text-ivory-50 placeholder:text-charcoal-400 focus:outline-none focus:ring-2 focus:ring-bronze-500/40 shadow-sm transition-all"
             autoFocus
           />
@@ -145,11 +156,11 @@ function SearchContent() {
         <div>
           {query ? (
             <span>
-              نتائج البحث عن: <strong className="text-charcoal-900 dark:text-ivory-50">"{query}"</strong>
+              نتائج البحث عن: <strong className="text-charcoal-900 dark:text-ivory-50">&ldquo;{query}&rdquo;</strong>
               {selectedCategory && ` في قسم (${demoCategories.find((c) => c.slug === selectedCategory)?.title})`}
             </span>
           ) : (
-            <span>استعراض جميع التحقيقات المتاحة ({results.length})</span>
+            <span>استعراض التحقيقات المتاحة ({results.length})</span>
           )}
         </div>
         <div>
@@ -158,7 +169,12 @@ function SearchContent() {
       </div>
 
       {/* Results List or Empty State */}
-      {results.length === 0 ? (
+      {isLoading ? (
+        <div className="py-20 text-center text-xs text-charcoal-500 flex items-center justify-center gap-2">
+          <Loader2 className="w-5 h-5 text-bronze-500 animate-spin" />
+          <span>جاري البحث في قاعدة بيانات Supabase...</span>
+        </div>
+      ) : results.length === 0 ? (
         <div className="py-20 text-center max-w-md mx-auto">
           <div className="w-14 h-14 rounded-full bg-bronze-500/10 text-bronze-500 flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-7 h-7" />
@@ -167,7 +183,7 @@ function SearchContent() {
             لم نجد نتائج مطابقة لبحثك
           </h3>
           <p className="text-xs text-charcoal-500 dark:text-charcoal-400 mb-6 leading-relaxed">
-            تأكد من كتابة الكلمات المفتاحية بشكل صحيح أو جرب استخدام مصطلحات أعم مثل "فضاء" أو "تاريخ" أو تصفح الأقسام مباشرة.
+            تأكد من كتابة الكلمات المفتاحية بشكل صحيح أو جرب استخدام مصطلحات أعم مثل &ldquo;فضاء&rdquo; أو &ldquo;تاريخ&rdquo; أو تصفح الأقسام مباشرة.
           </p>
           <button
             onClick={clearSearch}

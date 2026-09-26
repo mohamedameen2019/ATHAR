@@ -318,7 +318,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                       className="text-charcoal-900 dark:text-ivory-100 border-r-4 border-bronze-500 bg-bronze-500/5 dark:bg-bronze-500/10"
                     >
                       <p className="mb-2 italic font-editorial text-lg sm:text-xl">
-                        "{block.text}"
+                        &ldquo;{block.text}&rdquo;
                       </p>
                       {block.author && (
                         <cite className="block text-xs font-semibold text-bronze-600 dark:text-bronze-400 not-italic">

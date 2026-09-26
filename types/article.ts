@@ -51,7 +51,8 @@ export interface Article {
   quickFacts?: QuickFact[];
   timeline?: TimelineEvent[];
   contentBlocks: ArticleContentBlock[];
-  rawPortableText?: any;
+  status?: "published" | "draft" | "archived";
+  rawData?: any;
   sources: SourceReference[];
   relatedSlugs?: string[];
   seoTitle?: string;
